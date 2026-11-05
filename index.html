@@ -367,6 +367,20 @@ h1,h2,h3,h4,.brand strong{font-family:var(--font-display);letter-spacing:-.025em
  .canvas-box{break-inside:avoid}.canvas-box textarea{resize:none}
 }
 .bmc-confetti{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden}.bmc-confetti i{position:absolute;top:-18px;width:9px;height:14px;border-radius:2px;animation:bmc-fall 2.4s ease-in forwards}@keyframes bmc-fall{to{transform:translate3d(var(--dx),105vh,0) rotate(780deg);opacity:.9}}
+
+/* ===== Gamifikasi audio dan leaderboard ===== */
+#soundToggle{padding:8px 12px;font-size:12px}
+.lb-row{display:flex;align-items:center;gap:12px;padding:13px 12px;border-bottom:1px solid var(--line);border-radius:12px}
+.lb-row:first-child{background:linear-gradient(100deg,#fff7df,#fff)}
+.lb-rank{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:#eef3fa;font-weight:800;flex-shrink:0}
+.lb-row:first-child .lb-rank{background:#ffe7a8}
+.lb-name{font-weight:800;flex:1;min-width:0}.lb-meta{font-size:11px;color:var(--muted)}
+.lb-score{font:800 18px var(--font-display);color:#1d4ed8}
+.bmc-pop{position:fixed;z-index:10000;left:50%;top:18%;transform:translateX(-50%);padding:18px 24px;border-radius:20px;background:#fff;box-shadow:0 18px 60px rgba(15,42,92,.25);text-align:center;animation:popIn .45s cubic-bezier(.2,.8,.2,1);max-width:min(90vw,420px)}
+.bmc-pop strong{display:block;font:800 22px var(--font-display);color:#173f94}
+@keyframes popIn{from{opacity:0;transform:translate(-50%,20px) scale(.8)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+@keyframes pulseGlow{50%{box-shadow:0 0 0 8px rgba(37,99,235,.10),0 12px 30px rgba(37,99,235,.18)}}
+.result-panel{animation:fade .4s ease}
 </style>
 </head>
 <body>
@@ -382,11 +396,15 @@ h1,h2,h3,h4,.brand strong{font-family:var(--font-display);letter-spacing:-.025em
   <button data-view="templates"><span class="ico">▦</span> Template</button>
   <button data-view="quiz"><span class="ico">☑</span> Kuis</button>
   <button data-view="posttest"><span class="ico">🏁</span> Post-test</button>
+   <button data-view="leaderboard"><span class="ico">🏆</span> Peringkat</button>
  </nav>
  <div class="side-tip"><div class="bulb">💡</div><b>Ide bisnis dimulai di sini</b><p>Mulai dari masalah pelanggan, lalu bangun model bisnis yang masuk akal.</p><button class="btn primary" style="width:100%" onclick="showView('builder')">Mulai merancang →</button></div>
 </aside>
 <main class="main">
- <div class="topbar"><div><div class="eyebrow">Media pembelajaran ekonomi</div><h1 id="pageTitle">Halo, calon wirausaha! 👋</h1></div><div class="user-chip"><span>⭐</span><span id="chipText">0 poin • Pemula</span></div></div>
+ <div class="topbar"><div><div class="eyebrow">Media pembelajaran ekonomi</div><h1 id="pageTitle">Halo, calon wirausaha! 👋</h1></div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+  <button class="btn soft" id="soundToggle" type="button" onclick="toggleSound()" aria-pressed="true">🔊 Suara: ON</button>
+  <div class="user-chip"><span>⭐</span><span id="chipText">0 poin • Pemula</span></div>
+ </div></div>
 
  <section id="home" class="view active">
   <div class="hero">
@@ -765,6 +783,74 @@ async function submitResults(){
  finally{btn.disabled=false;btn.style.opacity='1';}
 }
 const _svSubmit=showView;showView=function(id){_svSubmit(id);if(id==='submit')renderSubmitSummary();};
+
+/* ===== BMC Learn: audio feedback, celebration, dan leaderboard ===== */
+let soundEnabled = localStorage.getItem('bmclearn-sound') !== 'off';
+let audioCtx = null;
+function toggleSound(){
+ soundEnabled=!soundEnabled;localStorage.setItem('bmclearn-sound',soundEnabled?'on':'off');
+ const b=document.getElementById('soundToggle');if(b){b.textContent=soundEnabled?'🔊 Suara: ON':'🔇 Suara: OFF';b.setAttribute('aria-pressed',String(soundEnabled));}
+ if(soundEnabled)playTone('success');
+}
+function playTone(kind='success'){
+ if(!soundEnabled)return;
+ try{
+  const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return;
+  audioCtx=audioCtx||new Ctx();if(audioCtx.state==='suspended')audioCtx.resume();
+  const now=audioCtx.currentTime;
+  const notes=kind==='wrong'?[220,165]:kind==='level'?[523,659,784,1046]:kind==='perfect'?[523,659,784,1046,1318]:kind==='click'?[440]:[440,554,659];
+  notes.forEach((hz,i)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=kind==='wrong'?'triangle':'sine';o.frequency.value=hz;g.gain.setValueAtTime(.0001,now+i*.105);g.gain.exponentialRampToValueAtTime(.12,now+i*.105+.025);g.gain.exponentialRampToValueAtTime(.0001,now+i*.105+.19);o.connect(g);g.connect(audioCtx.destination);o.start(now+i*.105);o.stop(now+i*.105+.21);});
+ }catch(e){}
+}
+function popAchievement(title,sub){
+ const old=document.querySelector('.bmc-pop');if(old)old.remove();
+ const p=document.createElement('div');p.className='bmc-pop';p.innerHTML='<div style="font-size:38px">✨🏅✨</div><strong>'+escapeHtml(title)+'</strong><div style="color:var(--muted);font-size:13px">'+escapeHtml(sub)+'</div>';
+ document.body.appendChild(p);setTimeout(()=>p.remove(),2500);
+}
+function celebrateScore(score,label){
+ if(score>=90){playTone(score===100?'perfect':'level');popAchievement(score===100?'PERFECT SCORE!':'KERJA BAGUS!',label+' • '+score+'/100');celebratePerfect();}
+ else if(score>=75){playTone('success');toast('🌟 '+label+': hasil bagus! '+score+'/100');}
+ else if(score>=60){playTone('click');toast('👏 '+label+': terus tingkatkan, kamu sudah berkembang!');}
+ else {playTone('wrong');toast('💪 '+label+': jadikan hasil ini bekal untuk mencoba lagi.');}
+}
+const _audioAnswerQuiz=answerQuiz;
+answerQuiz=function(i){const was=quizAnswered;_audioAnswerQuiz(i);if(!was)playTone(i===quizQuestions[quizIndex].correct?'success':'wrong');};
+const _audioGuess=guess;
+guess=function(k){const was=gAns;_audioGuess(k);if(!was)playTone(k===gameData[gOrder[gi]][1]?'success':'wrong');};
+const _audioAward=award;
+award=function(id,pts,el){const old=G.pts;_audioAward(id,pts,el);if(G.pts>old){playTone('click');if(lvl()[0]>old)playTone('level');}};
+const _audioCelebrate=celebratePerfect;
+celebratePerfect=function(){_audioCelebrate();playTone('perfect');};
+function loadLeaderboard(){
+ const list=document.getElementById('leaderboardList'),updated=document.getElementById('leaderboardUpdated');
+ if(!list)return;
+ if(!GOOGLE_SHEETS_ENDPOINT.endsWith('/exec')){list.innerHTML='<div class="empty">URL Apps Script belum diatur.</div>';return;}
+ list.innerHTML='<div class="empty">Memuat peringkat terbaru…</div>';
+ const cb='bmcLb_'+Date.now();
+ window[cb]=function(data){
+  try{
+   if(!data||!data.ok)throw new Error(data&&data.error||'Data belum tersedia');
+   const rows=Array.isArray(data.rows)?data.rows:[];
+   if(!rows.length){list.innerHTML='<div class="empty">Belum ada peserta dengan skor. Jadilah yang pertama!</div>';}
+   else list.innerHTML=rows.slice(0,50).map((r,i)=>'<div class="lb-row"><div class="lb-rank">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1)+'</div><div class="lb-name">'+escapeHtml(r.name||'Peserta')+'<div class="lb-meta">'+escapeHtml(r.kelas||'')+' • '+(r.completed||0)+' aktivitas</div></div><div class="lb-score">'+Number(r.average||0).toFixed(1)+'</div></div>').join('');
+   updated.textContent='Terakhir diperbarui: '+new Date().toLocaleTimeString('id-ID');
+  }catch(e){list.innerHTML='<div class="empty">Leaderboard belum dapat dimuat. Periksa deployment Apps Script.</div>';}
+  const s=document.getElementById(cb);if(s)s.remove();delete window[cb];
+ };
+ const s=document.createElement('script');s.id=cb;s.src=GOOGLE_SHEETS_ENDPOINT+'?action=leaderboard&callback='+cb+'&_='+Date.now();s.onerror=()=>{list.innerHTML='<div class="empty">Koneksi leaderboard gagal. Coba perbarui lagi.</div>';delete window[cb];s.remove();};document.body.appendChild(s);
+}
+const _lbShow=showView;showView=function(id){_lbShow(id);if(id==='leaderboard'){loadLeaderboard();}};
+
+const _audioTNext=tNext;
+tNext=function(){const stage=tm;_audioTNext();if(stage&&T[stage])celebrateScore(T[stage].score,stage==='pre'?'Pre-test':'Post-test');};
+const _audioNextQuestion=nextQuestion;
+nextQuestion=function(){_audioNextQuestion();if(quizFinished)celebrateScore(Math.round(quizScore/quizQuestions.length*100),'Kuis');};
+const _audioRenderGame=renderGame;
+renderGame=function(reset){_audioRenderGame(reset);if(gOrder.length&&gi>=gOrder.length)celebrateScore(Math.round(gScore/gOrder.length*100),'Tebak Elemen');};
+
+document.addEventListener('DOMContentLoaded',()=>{const b=document.getElementById('soundToggle');if(b){b.textContent=soundEnabled?'🔊 Suara: ON':'🔇 Suara: OFF';b.setAttribute('aria-pressed',String(soundEnabled));}});
+setInterval(()=>{if(document.getElementById('leaderboard')?.classList.contains('active'))loadLeaderboard();},30000);
+
 renderElements();renderTemplates();renderQuiz();renderMissions();updateChip();if(T.consent&&T.nama&&T.kelas)autoSendScores();
 </script>
 </body>
