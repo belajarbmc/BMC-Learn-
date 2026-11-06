@@ -487,6 +487,18 @@ h1,h2,h3,h4,.brand strong{font-family:var(--font-display);letter-spacing:-.025em
   <div class="page-intro"><div><h2 id="tesHeading">Pre-test 📝</h2><p id="tesDescription">Kerjakan tes awal ini sebelum mempelajari materi untuk mengetahui pemahaman awalmu tentang Business Model Canvas.</p></div><span class="pill" id="tesPill">TES AWAL • 10 SOAL</span></div>
   <div class="quiz-card" id="tesCard"><div class="empty">Memuat soal tes…</div></div>
  </section>
+ <section id="leaderboard" class="view">
+  <div class="page-intro"><div><h2>🏆 Peringkat Peserta</h2><p>Lihat peringkat berdasarkan rata-rata nilai aktivitas belajar yang sudah diselesaikan.</p></div><span class="pill">PEMBARUAN OTOMATIS</span></div>
+  <div class="panel" style="max-width:850px">
+   <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+    <div><h3 style="margin:0 0 4px">Top Learners</h3><p style="margin:0;color:var(--muted);font-size:13px">Nama panggilan ditampilkan sesuai data yang dikirim peserta.</p></div>
+    <button class="btn soft" type="button" onclick="loadLeaderboard()">↻ Perbarui peringkat</button>
+   </div>
+   <div id="leaderboardList"><div class="empty">Tekan “Perbarui peringkat” untuk memuat data.</div></div>
+   <p id="leaderboardUpdated" style="font-size:12px;color:var(--muted);margin:14px 0 0">Belum diperbarui.</p>
+   <p style="font-size:12px;color:var(--muted);margin:8px 0 0">Peringkat dihitung dari rata-rata nilai pre-test, post-test, kuis, dan permainan yang sudah tersedia. Data diperbarui otomatis setiap 30 detik saat halaman ini dibuka.</p>
+  </div>
+ </section>
  <section id="submit" class="view">
    <div class="page-intro"><div><h2>Kirim hasil belajar 📤</h2><p>Kirim draf BMC dan hasil tes ke pengajar. Data baru masuk ke Google Sheets setelah koneksi pengumpulan dikonfigurasi.</p></div><span class="pill">PENGUMPULAN HASIL</span></div>
    <div class="panel" style="max-width:760px">
@@ -550,7 +562,7 @@ function showView(id){
  if(id==='pretest'||id==='posttest'){window.bmcTestStage=id;id='tes';}
  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));
  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===requested));
- const titles={home:'Halo, calon wirausaha! 👋',materi:'Materi Business Model Canvas',pretest:'Pre-test',game:'Tebak Elemen BMC',builder:'Rancang model bisnismu',templates:'Pilih template BMC',quiz:'Kuis pemahaman BMC',posttest:'Post-test',tes:(window.bmcTestStage==='posttest'?'Post-test':'Pre-test'),submit:'Kirim hasil belajar'};
+ const titles={home:'Halo, calon wirausaha! 👋',materi:'Materi Business Model Canvas',pretest:'Pre-test',game:'Tebak Elemen BMC',builder:'Rancang model bisnismu',templates:'Pilih template BMC',quiz:'Kuis pemahaman BMC',posttest:'Post-test',tes:(window.bmcTestStage==='posttest'?'Post-test':'Pre-test'),leaderboard:'Peringkat Peserta',submit:'Kirim hasil belajar'};
  document.getElementById('pageTitle').textContent=titles[requested]||titles[id]||'BMC Learn';
  if(id==='materi')renderElements();if(id==='templates')renderTemplates();if(id==='quiz')renderQuiz();
  if(id==='tes')renderTes();
