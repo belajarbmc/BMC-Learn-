@@ -557,6 +557,10 @@ const quizQuestions=[
  {q:'Biaya bahan baku, sewa, dan promosi dicatat dalam…',a:['Customer Segments','Key Activities','Cost Structure','Revenue Streams'],correct:2,why:'Cost Structure merangkum biaya penting untuk menjalankan model bisnis.'}
 ];
 function showView(id){
+ // Tutup penjelasan elemen yang masih terbuka saat pengguna berpindah menu/halaman.
+ const detailToast=document.getElementById('toast');
+ if(detailToast)detailToast.classList.remove('show');
+ if(window.toastTimer){clearTimeout(window.toastTimer);window.toastTimer=null;}
  const requested=id;
  if(id==='pretest'||id==='posttest'){window.bmcTestStage=id;id='tes';}
  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));
