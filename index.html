@@ -61,7 +61,7 @@ h1,h2,h3,h4,.brand strong{font-family:var(--font-display);letter-spacing:-.025em
 .nav button.active:before{content:"";position:absolute;left:-16px;top:10px;bottom:10px;width:4px;border-radius:0 4px 4px 0;background:linear-gradient(#2563eb,#60a5fa)}
 .nav .ico{font-size:17px;width:24px;text-align:center}
 .side-tip{
- margin-top:auto;padding:18px;border-radius:20px;color:#fff;position:relative;overflow:hidden;
+ margin-top:auto;padding:18px;border-radius:20px;color:#fff;position:relative;overflow:hidden;flex-shrink:0;
  background:linear-gradient(150deg,#0f2a5c,#1d4ed8 80%);box-shadow:0 14px 30px rgba(29,78,216,.28)
 }
 .side-tip:after{content:"";position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.1)}
@@ -427,7 +427,6 @@ h1,h2,h3,h4,.brand strong{font-family:var(--font-display);letter-spacing:-.025em
   <div class="page-intro"><div><h2>Kenali 9 elemen BMC</h2><p>Business Model Canvas membantu kita melihat bagaimana bisnis menciptakan, menyampaikan, dan memperoleh nilai dalam satu tampilan.</p></div><span class="pill">9 KOMPONEN</span></div>
   <div class="filter-row"><input id="elementSearch" placeholder="Cari elemen BMC..." oninput="renderElements()"></div>
   <div id="elementGrid" class="element-grid"></div>
-  <div class="notice">💬 <b>Tips belajar:</b> gunakan pertanyaan pemantik pada setiap elemen. Jawaban awal tidak harus sempurna—yang penting logis dan saling berkaitan.</div>
  </section>
 
  <section id="builder" class="view">
@@ -576,7 +575,8 @@ function renderElements(){
 }
 function showElement(key){
  const e=elements.find(x=>x.key===key);if(!e)return;
- toast(e.name+': '+e.detail+' Contoh: '+e.example);
+ // Penjelasan tetap tampil sampai elemen BMC lain dipilih.
+ toast(e.name+': '+e.detail+' Contoh: '+e.example,0);
 }
 function renderTemplates(){
  const q=(document.getElementById('templateSearch')?.value||'').toLowerCase(),cat=document.getElementById('templateCategory')?.value||'all';
@@ -625,7 +625,13 @@ function downloadBMC(){
  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='bmc-'+(currentBMC.name||'usahaku').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.json';a.click();URL.revokeObjectURL(url);toast('File BMC diunduh.');
 }
 function saveBMC(){localStorage.setItem('bmclearn-draft',JSON.stringify(currentBMC));toast('Draf tersimpan di browser ini.');}
-function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>el.classList.remove('show'),3400);}
+function toast(msg,duration=3400){
+ const el=document.getElementById('toast');if(!el)return;
+ el.textContent=msg;el.classList.add('show');
+ clearTimeout(window.toastTimer);window.toastTimer=null;
+ // Durasi 0 membuat penjelasan tidak hilang otomatis.
+ if(Number(duration)>0)window.toastTimer=setTimeout(()=>el.classList.remove('show'),Number(duration));
+}
 function renderQuiz(){
  const card=document.getElementById('quizCard');
  if(quizFinished){const score=Math.round(quizScore/quizQuestions.length*100);card.innerHTML=`<div class="result-panel"><div class="result-icon">${score>=80?'🏆':score>=60?'🌟':'📚'}</div><div class="eyebrow">HASIL KUIS</div><div class="result-score">${score}<span style="font-size:20px;color:#8190a7">/100</span></div><h2>${score>=80?'Hebat! Pemahamanmu kuat.':score>=60?'Bagus, terus berlatih!':'Ayo pelajari lagi sembilan elemen.'}</h2><p style="color:var(--muted)">${quizScore} dari ${quizQuestions.length} jawaban benar.</p><button class="btn primary" onclick="resetQuiz()">↻ Ulangi kuis</button> <button class="btn white" onclick="showView('materi')">Pelajari materi</button></div>`;return;}
