@@ -389,8 +389,8 @@ h1,h2,h3,h4,.brand strong{font-family:var(--font-display);letter-spacing:-.025em
  <div class="brand"><div class="brand-mark">B</div><div><strong>BMC Learn</strong><small>Build Your Business Idea</small></div></div>
  <nav class="nav" aria-label="Navigasi utama">
   <button class="active" data-view="home"><span class="ico">⌂</span> Beranda</button>
-  <button data-view="materi"><span class="ico">▤</span> Materi BMC</button>
   <button data-view="pretest"><span class="ico">📝</span> Pre-test</button>
+  <button data-view="materi"><span class="ico">▤</span> Materi BMC</button>
   <button data-view="game"><span class="ico">🎮</span> Tebak Elemen</button>
   <button data-view="builder"><span class="ico">✦</span> Buat BMC</button>
   <button data-view="templates"><span class="ico">▦</span> Template</button>
@@ -408,14 +408,14 @@ h1,h2,h3,h4,.brand strong{font-family:var(--font-display);letter-spacing:-.025em
 
  <section id="home" class="view active">
   <div class="hero">
-   <div><span class="pill">BELAJAR • COBA • KEMBANGKAN</span><h2>Ubah ide sederhana<br>jadi <span>rencana bisnis.</span></h2><p>Pelajari sembilan elemen Business Model Canvas, coba template usaha, dan susun BMC dengan panduan langkah demi langkah.</p><button class="btn primary" onclick="showView('builder')">✨ Buat BMC pertamamu <span>→</span></button> <button class="btn white" onclick="showView('materi')">Pelajari materi</button></div>
+   <div><span class="pill">BELAJAR • COBA • KEMBANGKAN</span><h2>Ubah ide sederhana<br>jadi <span>rencana bisnis.</span></h2><p>Kerjakan pre-test terlebih dahulu, pelajari sembilan elemen Business Model Canvas, lalu susun BMC dengan panduan langkah demi langkah.</p><button class="btn primary" onclick="showView('builder')">✨ Buat BMC pertamamu <span>→</span></button> <button class="btn white" onclick="showView('materi')">Pelajari materi</button></div>
    <div class="hero-art"><div class="art-circle one"></div><div class="art-circle two"></div><div class="art-card top">📊<br>Model Bisnis</div><div class="art-person">🧑🏻‍💻</div><div class="art-card bottom">💡 Ide → BMC</div></div>
   </div>
   <div class="panel" style="margin-bottom:18px"><h3 style="margin:0 0 6px">Tujuan belajar</h3><p style="margin:0;color:var(--muted);font-size:14px;line-height:1.6">Setelah belajar di sini, kamu bisa (1) menjelaskan sembilan elemen BMC, (2) membedakan elemen yang mirip, terutama Key Resources dan Key Activities, dan (3) menyusun BMC untuk ide usahamu.</p></div>
   <div class="panel" id="missionPanel" style="margin-bottom:22px"></div>
-  <div class="section-head"><div><h3>Jalur belajarmu</h3><p>Ikuti tahapan belajar dari materi, pre-test, latihan, penyusunan BMC, hingga post-test.</p></div></div>
+  <div class="section-head"><div><h3>Jalur belajarmu</h3><p>Ikuti tahapan belajar dari pre-test, materi, latihan, penyusunan BMC, hingga post-test.</p></div></div>
   <div class="feature-grid">
-   <article class="feature" style="--wash:#e7f0ff;--accent:#2867cb"><div class="feature-icon">📘</div><h4>Pahami 9 Elemen</h4><p>Kenali fungsi setiap bagian BMC lewat penjelasan dan pertanyaan pemantik.</p><button onclick="showView('materi')">Buka materi →</button></article>
+   <article class="feature" style="--wash:#fff4df;--accent:#c28b18"><div class="feature-icon">📝</div><h4>Kerjakan Pre-test</h4><p>Ukur pemahaman awalmu tentang sembilan elemen Business Model Canvas.</p><button onclick="showView('pretest')">Mulai pre-test →</button></article>
    <article class="feature" style="--wash:#f0eaff;--accent:#7857d9"><div class="feature-icon">🧩</div><h4>Template Inspiratif</h4><p>Jelajahi contoh usaha kuliner, jasa, produk digital, dan bisnis siswa.</p><button onclick="showView('templates')">Jelajahi template →</button></article>
    <article class="feature" style="--wash:#def9ed;--accent:#07875f"><div class="feature-icon">🚀</div><h4>Susun BMC Terpandu</h4><p>Jawab pertanyaan tentang ide bisnis, lalu buat draf sembilan elemen otomatis.</p><button onclick="showView('builder')">Mulai menyusun →</button></article>
   </div>
@@ -643,7 +643,7 @@ function nextQuestion(){if(!quizAnswered)return;if(quizIndex<quizQuestions.lengt
 function resetQuiz(){quizIndex=0;quizScore=0;quizAnswered=false;quizFinished=false;renderQuiz();}
 
 /* ===== Gamifikasi ===== */
-const MIS=[['materi','📘 Pelajari materi BMC','materi'],['pre','📝 Kerjakan pre-test','pretest'],['game','🎮 Tebak sembilan elemen','game'],['bmc','✍️ Susun BMC usahamu','builder'],['template','🧩 Pelajari template','templates'],['quiz','🎯 Selesaikan kuis','quiz'],['post','🏁 Kerjakan post-test','posttest']];
+const MIS=[['pre','📝 Kerjakan pre-test','pretest'],['materi','📘 Pelajari materi BMC','materi'],['game','🎮 Tebak sembilan elemen','game'],['bmc','✍️ Susun BMC usahamu','builder'],['template','🧩 Pelajari template','templates'],['quiz','🎯 Selesaikan kuis','quiz'],['post','🏁 Kerjakan post-test','posttest']];
 const LV=[[0,'Pemula'],[50,'Calon Wirausaha'],[120,'Pengusaha Muda'],[200,'Master BMC']];
 const QEL=[null,'segments','value','channels','relations','revenue','resources','activities','partners','cost'];
 const gameData=[
